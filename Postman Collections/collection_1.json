@@ -1,0 +1,269 @@
+{
+	"info": {
+		"_postman_id": "ab971b84-63e8-415d-8e2f-e8c022acaca1",
+		"name": "Collection 1-Postman-API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Retrieve My Username",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "65e45205-6d46-4335-8c51-57fe1243d61f",
+						"exec": [
+							"// Retrieve my Postman username",
+							"const username = pm.response.json().user.username;",
+							"pm.collectionVariables.set(\"username\", username);",
+							"console.log(\"Hello Postman! My username is: \" + username)",
+							"",
+							"// Check the length of the username to determine the next step",
+							"const usernameLength = username.length;",
+							"",
+							"if (usernameLength > 6) {",
+							"    pm.collectionVariables.set(\"action\", \"fork\");",
+							"    console.log(\"Create a fork of your test collection 🍴\");",
+							"} else {",
+							"    pm.collectionVariables.set(\"action\", \"monitor\");",
+							"    console.log(\"Create a monitor of your test collection 🖥️\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"id": "c21f4aee-720d-4431-a1ae-22ef3cd33ac9",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-api-key",
+						"value": "{{myApiKey}}",
+						"type": "text"
+					}
+				],
+				"url": "https://api.getpostman.com/me"
+			},
+			"response": []
+		},
+		{
+			"name": "2a. Create Fork",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ddab55d7-de3e-43ae-a64e-cdadfc04bda2",
+						"exec": [
+							"if (pm.collectionVariables.get(\"action\") !== \"fork\") {",
+							"    pm.execution.skipRequest();",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"id": "505a8643-29d9-4bab-969d-9929cd1dc6aa",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"label\": \"{{username}}-fork\",\n  \"workspace\": \"{{workspace_id}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.getpostman.com/collections/fork/{{test_collection_id}}?workspace={{workspace_id}}",
+					"protocol": "https",
+					"host": [
+						"api",
+						"getpostman",
+						"com"
+					],
+					"path": [
+						"collections",
+						"fork",
+						"{{test_collection_id}}"
+					],
+					"query": [
+						{
+							"key": "workspace",
+							"value": "{{workspace_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2b. Create Monitor",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "07575b07-7077-49d4-9f0d-62811acfb416",
+						"exec": [
+							"if (pm.collectionVariables.get(\"action\") !== \"monitor\") {",
+							"    pm.execution.skipRequest();",
+							"} else {",
+							"    console.log(\"Creating a monitor for the test collection 🖥️\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"id": "c6e4779c-2a70-4aa3-b8fd-d97bd5d856e9",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"monitor\": {\n        \"name\": \"{{username}}-monitor\",\n        \"collection\": {\n            \"id\": \"{{test_collection_id}}\"\n        },\n        \"schedule\": {\n            \"cron\": \"0 0 * * * *\",\n            \"timezone\": \"UTC\"\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://api.getpostman.com/monitors"
+			},
+			"response": []
+		},
+		{
+			"name": "3. Retrieve Collection Name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "746e836d-0d4b-4870-860f-82668c3cd8c9",
+						"exec": [
+							"// Here I retrieve the collection name from the response",
+							"const response = pm.response.json();",
+							"const currentName = response.collection.info.name;",
+							"",
+							"// Here I retrieve the action (fork or monitor)",
+							"const action = pm.collectionVariables.get(\"action\");",
+							"",
+							"// Here I combine the collection name with the action ",
+							"const newName = currentName + \"-has-\" + action;",
+							"pm.collectionVariables.set(\"new_collection_name\", newName);",
+							"console.log(\"New name will be: \" + newName);",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"id": "77c054bd-aeec-4c4e-8a2a-770d5348f4c2",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "https://api.getpostman.com/collections/{{test_collection_id}}"
+			},
+			"response": []
+		},
+		{
+			"name": "4. Rename Collection",
+			"id": "23943b29-a52c-4ee1-9127-9cf7b86fd0cd",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"collection\": {\n        \"info\": {\n            \"name\": \"{{new_collection_name}}\",\n            \"schema\": \"https://schema.getpostman.com/json/collection/v2.1.0/collection.json\"\n        },\n        \"item\": []\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://api.getpostman.com/collections/{{test_collection_id}}"
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": {
+			"value": "{{postman_api_key}}",
+			"key": "X-API-Key"
+		}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "ab35b763-468d-4933-9a0e-2c16004a640c",
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "dc40e87c-a329-459c-ab1d-846a04cbc673",
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "test_collection_id",
+			"value": ""
+		},
+		{
+			"key": "workspace_id",
+			"value": ""
+		},
+		{
+			"key": "action",
+			"value": ""
+		},
+		{
+			"key": "username",
+			"value": ""
+		},
+		{
+			"key": "new_collection_name",
+			"value": ""
+		}
+	]
+}
