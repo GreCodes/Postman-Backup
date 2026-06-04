@@ -209,6 +209,18 @@
 				"url": "https://api.getpostman.com/collections/{{test_collection_id}}"
 			},
 			"response": []
+		},
+		{
+			"name": "New Request",
+			"id": "ecc1a6e7-3fa1-42c3-b0b1-e68ee141832f",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
 		}
 	],
 	"auth": {
